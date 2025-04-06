@@ -105,6 +105,26 @@ class GitRepoToJson:
         except Exception as e:
             logging.error(f"Failed to write Markdown file: {e}")
 
+    def write_to_txt(self, data):
+        """
+        Write collected file data to a human-readable .txt file.
+        The TXT file name will include the repository name.
+        """
+        output_file = f"{self.repo_name}.txt"
+        logging.info(f"Writing data to {output_file}")
+        try:
+            with open(output_file, "w", encoding='utf-8') as txt_file:
+                txt_file.write(f"Repository: {self.repo_name}\n\n")
+                txt_file.write("File List:\n\n")
+                for item in data:
+                    txt_file.write(f"Filename: {item['filename']}\n")
+                    txt_file.write(f"Path: {item['path']}\n")
+                    txt_file.write(f"Content:\n")
+                    txt_file.write(f"{item['content']}\n\n")
+            logging.info("TXT file successfully written.")
+        except Exception as e:
+            logging.error(f"Failed to write TXT file: {e}")
+
     def clean_up(self):
         """
         Delete the temporary cloned repository directory.
@@ -124,9 +144,9 @@ class GitRepoToJson:
             data = self.parse_files()
             self.write_to_json(data)
             self.write_to_markdown(data)
+            self.write_to_txt(data)  # Added TXT output
         finally:
             self.clean_up()
-
 
 if __name__ == '__main__':
     repo_url = input("Enter GitHub repository URL: ").strip()
