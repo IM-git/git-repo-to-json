@@ -85,6 +85,26 @@ class GitRepoToJson:
         except Exception as e:
             logging.error(f"Failed to write JSON file: {e}")
 
+    def write_to_markdown(self, data):
+        """
+        Write collected file data to a Markdown file.
+        The Markdown file name will include the repository name.
+        """
+        output_file = f"{self.repo_name}.md"
+        logging.info(f"Writing data to {output_file}")
+        try:
+            with open(output_file, "w", encoding='utf-8') as md_file:
+                md_file.write(f"# Repository: {self.repo_name}\n\n")
+                md_file.write("## File List\n\n")
+                md_file.write("| Filename | Path | Content |\n")
+                md_file.write("| --- | --- | --- |\n")
+                for item in data:
+                    md_file.write(f"| {item['filename']} | {item['path']} | \n")
+                    md_file.write(f"```text\n{item['content']}\n```\n\n")
+            logging.info("Markdown file successfully written.")
+        except Exception as e:
+            logging.error(f"Failed to write Markdown file: {e}")
+
     def clean_up(self):
         """
         Delete the temporary cloned repository directory.
@@ -103,6 +123,7 @@ class GitRepoToJson:
             self.clone_repo()
             data = self.parse_files()
             self.write_to_json(data)
+            self.write_to_markdown(data)
         finally:
             self.clean_up()
 

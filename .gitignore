@@ -131,4 +131,6 @@ dmypy.json
 # My list of ignored files/folders
 .idea
 *.json
+*.md
+!README.md
 .git
