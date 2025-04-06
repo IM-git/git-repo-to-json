@@ -4,6 +4,7 @@ import tempfile
 import shutil
 import logging
 from git import Repo
+from urllib.parse import urlparse
 
 # Setup logging
 logging.basicConfig(
@@ -11,12 +12,22 @@ logging.basicConfig(
     format="%(asctime)s [%(levelname)s] %(message)s"
 )
 
+
 class GitRepoToJson:
 
     def __init__(self, repo_url: str):
         self.repo_url = repo_url
         self.repo_dir = None
         self.repo = None
+        self.repo_name = self.get_repo_name()
+
+    def get_repo_name(self):
+        """
+        Extract the repository name from the URL.
+        """
+        parsed_url = urlparse(self.repo_url)
+        repo_name = os.path.basename(parsed_url.path)
+        return repo_name
 
     def clone_repo(self):
         """
@@ -60,10 +71,12 @@ class GitRepoToJson:
         logging.info(f"Found {len(file_list)} files.")
         return file_list
 
-    def write_to_json(self, data, output_file="repo_contents.json"):
+    def write_to_json(self, data):
         """
         Write collected file data to a JSON file.
+        The JSON file name will include the repository name.
         """
+        output_file = f"{self.repo_name}.json"
         logging.info(f"Writing data to {output_file}")
         try:
             with open(output_file, "w", encoding='utf-8') as json_file:
@@ -92,6 +105,7 @@ class GitRepoToJson:
             self.write_to_json(data)
         finally:
             self.clean_up()
+
 
 if __name__ == '__main__':
     repo_url = input("Enter GitHub repository URL: ").strip()
